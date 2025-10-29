@@ -4,7 +4,7 @@ pygame.init()
 
 screenWidth, screenHeight = 700, 500 
 screen = pygame.display.set_mode((screenWidth, screenHeight))
-pygame.display.set_caption("Bame by Sujal Agre")
+pygame.display.set_caption("Bame")
 
 running = True
 gameOver = False
