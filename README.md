@@ -15,4 +15,3 @@ A ball game :D
 
 - [ ] high score
 - [ ] 3 sfx
-- [ ] game icon
