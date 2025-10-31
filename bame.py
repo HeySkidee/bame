@@ -6,6 +6,13 @@ screenWidth, screenHeight = 700, 500
 screen = pygame.display.set_mode((screenWidth, screenHeight))
 pygame.display.set_caption("Bame")
 
+FPS = 60
+clock = pygame.time.Clock()
+
+# movement speeds are pixels per second (frame-independent)
+PADDLE_SPEED = 400.0
+BALL_SPEED = 300.0
+
 running = True
 gameOver = False
 
@@ -14,7 +21,8 @@ rectPosition = pygame.Vector2(screen.get_width() / 2 - rectWidth / 2, screen.get
 
 ballRadius = 15
 ballPosition = pygame.Vector2(screen.get_width() / 2, screen.get_height() - rectHeight - ballRadius)
-ballVelocity = pygame.Vector2(0.2, -0.2)  # ball starts moving right and up first
+
+ballVelocity = pygame.Vector2(BALL_SPEED, -BALL_SPEED)  # ball starts moving right and up first
 
 buttonWidth, buttonHeight = 200, 50
 buttonX = screenWidth // 2 - buttonWidth // 2
@@ -23,27 +31,32 @@ buttonY = screenHeight // 2 + 20
 def reset_game():
     global ballPosition, ballVelocity, rectPosition, gameOver
     ballPosition = pygame.Vector2(screen.get_width() / 2, screen.get_height() - rectHeight - ballRadius)
-    ballVelocity = pygame.Vector2(0.2, -0.2)
+    ballVelocity = pygame.Vector2(BALL_SPEED, -BALL_SPEED)
     rectPosition = pygame.Vector2(screen.get_width() / 2 - rectWidth / 2, screen.get_height() - rectHeight - 3.5)
     gameOver = False
 
 while running:
+    # tick clock and get frame delta-time (seconds)
+    dt = clock.tick(FPS) / 1000.0
+
     # to close the game on clicking X icon
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
 
     if not gameOver:
-        # change position on key press
+        # change position on key press (frame-rate independent)
         keys = pygame.key.get_pressed()
         if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
-            if rectPosition.x < screenWidth - rectWidth: rectPosition.x += 0.2
+            if rectPosition.x < screenWidth - rectWidth:
+                rectPosition.x += PADDLE_SPEED * dt
         if keys[pygame.K_LEFT] or keys[pygame.K_a]:
-            if rectPosition.x > 0: rectPosition.x -= 0.2
+            if rectPosition.x > 0:
+                rectPosition.x -= PADDLE_SPEED * dt
 
-        # ball movement
-        ballPosition.x += ballVelocity.x
-        ballPosition.y += ballVelocity.y
+        # ball movement (frame-rate independent)
+        ballPosition.x += ballVelocity.x * dt
+        ballPosition.y += ballVelocity.y * dt
 
         # ball collision with left and right walls
         if ballPosition.x - ballRadius <= 0 or ballPosition.x + ballRadius >= screenWidth:
@@ -66,7 +79,8 @@ while running:
 
         screen.fill("lightpink") # to clear the screen on every frame
         pygame.draw.rect(screen, "black", (rectPosition.x, rectPosition.y, rectWidth, rectHeight), 20)
-        pygame.draw.circle(screen, "white", ballPosition, 15) # drawing a circle above the rectangle
+        # draw circle with integer coordinates
+        pygame.draw.circle(screen, "white", (int(ballPosition.x), int(ballPosition.y)), ballRadius) # drawing a circle above the rectangle
     else:
     # restart menu
         # game over text
@@ -107,4 +121,3 @@ while running:
 
 pygame.quit() # clearing memory on closing the game
 
-# name, icon, add 3 sfx, score, high score and fps limiting
